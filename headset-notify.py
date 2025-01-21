@@ -104,13 +104,18 @@ def main() -> None:
     Continuously monitors the headset's connection status and battery level,
     sending desktop notifications when the device connects or disconnects.
     Implements rate limiting and adaptive polling based on CPU usage.
+    Sends a notification if the device reaches 10% or below battery level.
     """
 
     logging.info("Starting wireless headset monitor...")
+
+    LOW_BATTERY_THRESHOLD = 10
+
     last_available = False
     last_device_name = None
     last_check = 0
     min_time_between_checks = 0.1
+    low_battery_notified = False  # Prevent repeated notifications
 
     while True:
         try:
@@ -137,6 +142,19 @@ def main() -> None:
                     "Headset Turned Off", f"Device '{last_device_name}' powered down"
                 )
                 last_available = False
+                low_battery_notified = False
+
+            if (
+                battery_level is not None
+                and battery_level <= LOW_BATTERY_THRESHOLD
+                and not low_battery_notified
+            ):
+                send_notification(
+                    "Low Battery Warning", f"Headset battery is at {battery_level}%"
+                )
+                low_battery_notified = True
+            elif battery_level is not None and battery_level > LOW_BATTERY_THRESHOLD:
+                low_battery_notified = False
 
         except Exception as e:
             logging.error(f"Error in main loop: {e}")
