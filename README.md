@@ -17,8 +17,7 @@ sudo cp headset-notify.service /etc/systemd/system/
 - Enable and start the service:
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable headset-notify.service
-sudo systemctl start headset-notify.service
+sudo systemctl enable --now headset-notify.service
 ```
 
 - Check the status
